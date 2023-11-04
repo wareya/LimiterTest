@@ -55,6 +55,7 @@ class Limiter extends RefCounted:
         amp_memory[amp_memory_cursor] = amp
         
         # update affected bucket
+        @warning_ignore("integer_division")
         var bucket := amp_memory_cursor / amp_bucket_size
         amp_min_buckets[bucket] = 1.0
         for i in range(bucket * amp_bucket_size, min((bucket + 1) * amp_bucket_size, amp_memory.size())):
@@ -115,22 +116,15 @@ func make_wav() -> AudioStreamWAV:
         
         data.push_back(0)
         data.push_back(0)
-        data.encode_s16(data.size() - 2, sample * 32767.0)
+        data.encode_s16(data.size() - 2, int(sample * 32767.0))
     
     wav.data = data
-    wav.mix_rate = srate
+    wav.mix_rate = int(srate)
     
     wav.save_to_wav("out__a_asdf.wav")
     
     return wav
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
     $AudioStreamPlayer.stream = make_wav()
     $AudioStreamPlayer.play()
-
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-    pass
