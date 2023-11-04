@@ -14,12 +14,10 @@ class Limiter extends RefCounted:
     
     var release_memory := 0.0
     
-    var box_blur := 0
     var amp := 1.0
     var ref_amp := 1.0
     
     var memory_cursor := 0
-    var sustained_amp := PackedFloat32Array()
     var sample_memory := PackedFloat32Array()
     
     var amp_memory_cursor := 0
@@ -30,7 +28,6 @@ class Limiter extends RefCounted:
     func _init():
         for i in int(ceil(srate * attack)) + 1:
             sample_memory.push_back(0.0)
-            sustained_amp.push_back(0.0)
         
         var amp_count := int(ceil(srate * (attack + sustain))) + 1
         amp_bucket_size = int(sqrt(amp_count))
@@ -74,11 +71,6 @@ class Limiter extends RefCounted:
         
         amp_memory_cursor = (amp_memory_cursor + 1) % amp_memory.size()
         
-        # update the sustain buffer
-        box_blur -= int(sustained_amp[memory_cursor] * 32767.0)
-        sustained_amp[memory_cursor] = min_amp
-        box_blur += int(sustained_amp[memory_cursor] * 32767.0)
-        
         # update the sample memory buffer
         var ret_sample := sample_memory[memory_cursor] if sustain + attack > 0.0 else sample
         sample_memory[memory_cursor] = sample
@@ -86,7 +78,7 @@ class Limiter extends RefCounted:
         memory_cursor = (memory_cursor + 1) % sample_memory.size()
         
         # return the limited sample
-        return ret_sample * (box_blur / 32767.0 / sample_memory.size()) * post_gain
+        return ret_sample * min_amp * post_gain
         #return box_blur / 32767.0 / sample_memory.size()
 
 func make_wav() -> AudioStreamWAV:
