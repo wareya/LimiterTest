@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cunyr3vvitnsv"]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_lc38g"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_lc38g")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
