@@ -53,8 +53,8 @@ class Limiter extends RefCounted:
         var ref_val := absf(amp * sample)
         if ref_val >= limit:
             var amount = limit / ref_val
-            ref_amp = amp
             amp *= amount
+            ref_amp = amp
             ref_val *= amount
             release_memory = release
         
